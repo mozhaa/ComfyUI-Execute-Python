@@ -13,5 +13,9 @@ Choose one of these options:
 
 ## Usage
 Write your Python code in the widget (it may include imports, functions and any other language features) and assign `result` variable somewhere in the code. If you use multiple outputs, use a tuple (for example `result = 1, 2, 3`).
+
+> [!IMPORTANT]
+> For safety reasons, this node can't be used from shared workflows, which means that **it would only work if you created it yourself**.
+
 > [!WARNING]
 > The code is executed with a simple `exec`, so execute only trusted Python code
