@@ -2,6 +2,7 @@
 A single node for executing arbitrary Python code with arbitrary inputs of any types
 
 ## Preview
+![demo](https://github.com/user-attachments/assets/4cba256d-ab0b-409f-852b-5ccde0857ee0)
 <img width="1181" height="504" alt="workflow (2)" src="https://github.com/user-attachments/assets/22d1e6d9-6dfa-42ff-b3e7-a875a42fe210" />
 
 ## Installation
