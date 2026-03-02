@@ -58,7 +58,7 @@ function reconcileOutputs(node) {
 app.registerExtension({
     name: "Comfy.ExecutePythonDynamicIO",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name !== "ExecutePython") return;
+        if (!nodeData.name.startsWith("ExecutePython")) return;
 
         const origOnConnectionsChange = nodeType.prototype.onConnectionsChange;
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;

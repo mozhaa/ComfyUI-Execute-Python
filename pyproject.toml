@@ -6,6 +6,7 @@ license = {file = "LICENSE"}
 classifiers = [
     "Operating System :: OS Independent",
 ]
+dependencies = ["py-machineid"]
 
 [project.urls]
 Repository = "https://github.com/mozhaa/ComfyUI-Execute-Python"
