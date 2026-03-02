@@ -34,17 +34,54 @@ function reconcileDynamicInputs(node) {
     }
 }
 
+function reconcileOutputs(node) {
+    const outputCountWidget = node.widgets?.find(w => w.name === 'n_outputs');
+    if (!outputCountWidget) return;
+    
+    const desired = outputCountWidget.value;
+    const current = node.outputs ? node.outputs.length : 0;
+
+    if (desired > current) {
+        for (let i = current; i < desired; i++) {
+            node.addOutput(`res${i}`, "*");
+        }
+    } else if (desired < current) {
+        for (let i = current - 1; i >= desired; i--) {
+            if (node.outputs[i]?.links?.length) {
+                node.disconnectOutput(i);
+            }
+            node.removeOutput(i);
+        }
+    }
+}
+
 app.registerExtension({
-    name: "Comfy.ExecutePythonDynamicInputs",
+    name: "Comfy.ExecutePythonDynamicIO",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== "ExecutePython") return;
 
         const origOnConnectionsChange = nodeType.prototype.onConnectionsChange;
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;
+        const origOnNodeLoaded = nodeType.prototype.onNodeLoaded;
 
         nodeType.prototype.onNodeCreated = function () {
             const result = origOnNodeCreated?.apply(this, arguments);
+
             setTimeout(() => reconcileDynamicInputs(this), 100);
+
+            const outputCountWidget = this.widgets?.find(w => w.name === 'n_outputs');
+            if (outputCountWidget) {
+                outputCountWidget.callback = () => reconcileOutputs(this);
+                setTimeout(() => reconcileOutputs(this), 10);
+            }
+
+            return result;
+        };
+
+        nodeType.prototype.onNodeLoaded = function () {
+            const result = origOnNodeLoaded?.apply(this, arguments);
+            reconcileDynamicInputs(this);
+            reconcileOutputs(this);
             return result;
         };
 
