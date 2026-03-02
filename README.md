@@ -13,4 +13,5 @@ Choose one of these options:
 
 ## Usage
 Write your Python code in the widget (it may include imports, functions and any other language features) and assign `result` variable somewhere in the code.
-> The code is executed with a simple `exec`, so use only trusted Python code
+> [!WARNING]
+> The code is executed with a simple `exec`, so execute only trusted Python code
