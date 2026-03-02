@@ -1,0 +1,19 @@
+[project]
+name = "execute-python"
+description = "A single ComfyUI node for executing arbitrary Python code with arbitrary inputs of any types."
+version = "1.0.0"
+license = {file = "LICENSE"} 
+classifiers = [
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Repository = "https://github.com/mozhaa/ComfyUI-Execute-Python"
+Documentation = "https://github.com/mozhaa/ComfyUI-Execute-Python/blob/main/README.md"
+"Bug Tracker" = "https://github.com/mozhaa/ComfyUI-Execute-Python/issues"
+
+[tool.comfy]
+PublisherId = "mozhaa"
+DisplayName = "Execute Python"
+Icon = ""
+includes = [] 
