@@ -75,9 +75,6 @@ async function upgradeCodeWidget(node) {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
-    const resizeObserver = new ResizeObserver(() => editor.resize());
-    resizeObserver.observe(node.dom);
-
     textarea.aceEditor = editor;
     editor.resize();
 }
