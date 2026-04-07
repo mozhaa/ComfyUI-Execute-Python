@@ -25,6 +25,7 @@ function updateAllExecutePythonNodes() {
 
 async function upgradeCodeWidget(node) {
     const enableHighlighting = app.extensionManager.setting.get('ExecutePython.enableHighlighting')
+    const showLineNumbers = app.extensionManager.setting.get('ExecutePython.showLineNumbers')
     const theme = app.extensionManager.setting.get('ExecutePython.theme')
     
     const codeWidget = node.widgets?.find(w => w.name === 'code');
@@ -54,18 +55,17 @@ async function upgradeCodeWidget(node) {
     textarea.style.display = 'none';
     const container = document.createElement('div');
     container.style.width = '100%';
-    container.style.height = 'auto';
+    container.style.height = '100%';
+    container.style.flex = '1 1 0';
     textarea.parentNode.insertBefore(container, textarea.nextSibling);
 
     const editor = ace.edit(container);
     editor.setTheme(`ace/theme/${theme}`);
     editor.session.setMode('ace/mode/python');
     editor.setOptions({
-        fontSize: '12px',
-        fontFamily: 'monospace',
-        maxLines: 20,
-        minLines: 5,
         showPrintMargin: false,
+        showLineNumbers: showLineNumbers,
+        showGutter: showLineNumbers,
         wrap: true
     });
     editor.setValue(textarea.value, -1);
@@ -145,6 +145,15 @@ app.registerExtension({
             name: "Enable syntax highlighting for ExecutePython node",
             type: "boolean",
             defaultValue: true,
+            onChange: () => {
+                setTimeout(() => updateAllExecutePythonNodes(), 100)
+            }
+        },
+        {
+            id: "ExecutePython.showLineNumbers",
+            name: "Show line numbers in ExecutePython node",
+            type: "boolean",
+            defaultValue: false,
             onChange: () => {
                 setTimeout(() => updateAllExecutePythonNodes(), 100)
             }
