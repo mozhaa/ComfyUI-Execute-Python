@@ -14,12 +14,42 @@ function loadAce() {
     return aceLoaded;
 }
 
+function updateAllExecutePythonNodes() {
+    const allNodes = app.graph?._nodes || app.canvas?.nodes || [];
+    for (const node of allNodes) {
+        if (node.type && node.type.startsWith("ExecutePython")) {
+            upgradeCodeWidget(node).catch(console.warn);
+        }
+    }
+}
+
 async function upgradeCodeWidget(node) {
-    await loadAce();
+    const enableHighlighting = app.extensionManager.setting.get('ExecutePython.enableHighlighting')
+    const theme = app.extensionManager.setting.get('ExecutePython.theme')
+    
     const codeWidget = node.widgets?.find(w => w.name === 'code');
     if (!codeWidget) return;
     const textarea = codeWidget.element;
-    if (!textarea || textarea.aceEditor) return;
+    if (!textarea) return;
+
+    if (textarea.aceEditor) {
+        textarea.aceEditor.destroy();
+        delete textarea.aceEditor;
+    }
+    if (textarea.nextSibling && textarea.nextSibling.classList?.contains('ace_editor')) {
+        textarea.nextSibling.remove();
+    }
+    const parent = textarea.parentNode;
+    const existingAce = parent.querySelector('.ace_editor');
+    if (existingAce) existingAce.remove();
+
+    textarea.style.display = '';
+
+    if (!enableHighlighting) {
+        return;
+    }
+
+    await loadAce();
 
     textarea.style.display = 'none';
     const container = document.createElement('div');
@@ -28,7 +58,7 @@ async function upgradeCodeWidget(node) {
     textarea.parentNode.insertBefore(container, textarea.nextSibling);
 
     const editor = ace.edit(container);
-    editor.setTheme('ace/theme/chrome');
+    editor.setTheme(`ace/theme/${theme}`);
     editor.session.setMode('ace/mode/python');
     editor.setOptions({
         fontSize: '12px',
@@ -109,6 +139,37 @@ function reconcileOutputs(node) {
 
 app.registerExtension({
     name: "Comfy.ExecutePythonDynamicIO",
+    settings: [
+        {
+            id: "ExecutePython.enableHighlighting",
+            name: "Enable syntax highlighting for ExecutePython node",
+            type: "boolean",
+            defaultValue: true,
+            onChange: () => {
+                setTimeout(() => updateAllExecutePythonNodes(), 100)
+            }
+        },
+        {
+            id: "ExecutePython.theme",
+            name: "ExecutePython Editor Theme",
+            type: "combo",
+            defaultValue: "chrome",
+            options: [
+                { text: "Chrome (Light)", value: "chrome" },
+                { text: "Monokai (Dark)", value: "monokai" },
+                { text: "Twilight (Dark)", value: "twilight" },
+                { text: "GitHub (Light)", value: "github" },
+                { text: "Xcode (Light)", value: "xcode" },
+                { text: "Eclipse (Light)", value: "eclipse" },
+                { text: "Terminal (Dark)", value: "terminal" },
+                { text: "Solarized Light", value: "solarized_light" },
+                { text: "Solarized Dark", value: "solarized_dark" }
+            ],
+            onChange: () => {
+                setTimeout(() => updateAllExecutePythonNodes(), 100)
+            }
+        }
+    ],
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (!nodeData.name.startsWith("ExecutePython")) return;
 
