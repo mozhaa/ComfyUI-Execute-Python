@@ -1,5 +1,57 @@
 import { app } from "../../scripts/app.js";
 
+let aceLoaded = null;
+function loadAce() {
+    if (window.ace) return Promise.resolve();
+    if (aceLoaded) return aceLoaded;
+    aceLoaded = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.5/ace.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+    return aceLoaded;
+}
+
+async function upgradeCodeWidget(node) {
+    await loadAce();
+    const codeWidget = node.widgets?.find(w => w.name === 'code');
+    if (!codeWidget) return;
+    const textarea = codeWidget.element;
+    if (!textarea || textarea.aceEditor) return;
+
+    textarea.style.display = 'none';
+    const container = document.createElement('div');
+    container.style.width = '100%';
+    container.style.height = 'auto';
+    textarea.parentNode.insertBefore(container, textarea.nextSibling);
+
+    const editor = ace.edit(container);
+    editor.setTheme('ace/theme/chrome');
+    editor.session.setMode('ace/mode/python');
+    editor.setOptions({
+        fontSize: '12px',
+        fontFamily: 'monospace',
+        maxLines: 20,
+        minLines: 5,
+        showPrintMargin: false,
+        wrap: true
+    });
+    editor.setValue(textarea.value, -1);
+
+    editor.session.on('change', () => {
+        textarea.value = editor.getValue();
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    const resizeObserver = new ResizeObserver(() => editor.resize());
+    resizeObserver.observe(node.dom);
+
+    textarea.aceEditor = editor;
+    editor.resize();
+}
+
 function reconcileDynamicInputs(node) {
     const inputs = node.inputs || [];
     
@@ -67,7 +119,11 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const result = origOnNodeCreated?.apply(this, arguments);
 
-            setTimeout(() => reconcileDynamicInputs(this), 100);
+            setTimeout(() => {
+                reconcileDynamicInputs(this);
+                reconcileOutputs(this);
+                upgradeCodeWidget(this);
+            }, 100);
 
             const outputCountWidget = this.widgets?.find(w => w.name === 'n_outputs');
             if (outputCountWidget) {
@@ -82,6 +138,7 @@ app.registerExtension({
             const result = origOnNodeLoaded?.apply(this, arguments);
             reconcileDynamicInputs(this);
             reconcileOutputs(this);
+            upgradeCodeWidget(this);
             return result;
         };
 
