@@ -162,7 +162,7 @@ app.registerExtension({
             id: "ExecutePython.theme",
             name: "ExecutePython Editor Theme",
             type: "combo",
-            defaultValue: "chrome",
+            defaultValue: "monokai",
             options: [
                 { text: "Chrome (Light)", value: "chrome" },
                 { text: "Monokai (Dark)", value: "monokai" },
