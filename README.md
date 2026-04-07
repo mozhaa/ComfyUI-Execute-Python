@@ -5,6 +5,10 @@ A single node for executing arbitrary Python code with arbitrary inputs of any t
 ![output_new_min_best](https://github.com/user-attachments/assets/517ad407-8bee-4424-b5ab-ed11f7c34c18)
 <img width="1196" height="797" alt="image" src="https://github.com/user-attachments/assets/aa3216de-8a2f-4170-be5c-36b12c2f5620" />
 
+### UPD: syntax highlighting
+<img width="1487" height="839" alt="Screenshot_20260407_104048" src="https://github.com/user-attachments/assets/20de1e1b-306c-4ba2-bacf-407efd2e3346" />
+<img width="1044" height="629" alt="Screenshot_20260407_104547" src="https://github.com/user-attachments/assets/8e86c8b9-5616-4e0f-a729-cb9e67a4e301" />
+
 ## Installation
 Choose one of these options:
 1. **Install via ComfyUI-Manager** (search for "Execute Python")
